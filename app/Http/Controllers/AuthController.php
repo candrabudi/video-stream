@@ -9,8 +9,10 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function showLogin()
+    public function index()
     {
+        return 'kongol';
+
         return view('bo.auth.login');
     }
 

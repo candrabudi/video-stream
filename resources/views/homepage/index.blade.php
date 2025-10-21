@@ -98,7 +98,7 @@
             }
 
             grid.innerHTML = videosToRender.map(video => `
-                <div class="video-card" onclick="window.location.href='/${video.id}'">
+                <div class="video-card" onclick="window.location.href='/get-videos/${video.id}'">
                     <div class="thumbnail-wrapper">
                         <img src="${video.thumbnail}" alt="${video.title}" class="thumbnail">
                         <div class="play-overlay">
