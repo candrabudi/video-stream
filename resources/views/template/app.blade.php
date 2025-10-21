@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,16 +12,18 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #0f0f0f;
-            color: #ffffff;
+            background: #f5f5f5;
+            color: #111111;
         }
 
         .sidebar {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             will-change: transform;
+            background: #ffffff;
+            border-right: 1px solid #e0e0e0;
         }
 
         .sidebar-mini {
@@ -52,11 +55,11 @@
                 z-index: 40;
                 transform: translateX(-100%);
             }
-            
+
             .sidebar.mobile-open {
                 transform: translateX(0);
             }
-            
+
             .main-content {
                 margin-left: 0 !important;
             }
@@ -64,18 +67,15 @@
 
         .video-card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background: #1a1a1a;
+            background: #ffffff;
             border-radius: 12px;
             overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
         }
 
         .video-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
-        }
-
-        .video-card:hover .thumbnail {
-            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
 
         .thumbnail-wrapper {
@@ -83,7 +83,7 @@
             width: 100%;
             padding-bottom: 56.25%;
             overflow: hidden;
-            background: #000;
+            background: #e0e0e0;
             border-radius: 12px 12px 0 0;
         }
 
@@ -103,7 +103,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.5);
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -115,7 +115,7 @@
         .play-button {
             width: 64px;
             height: 64px;
-            background: rgba(255, 255, 255, 0.95);
+            background: #ffffff;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -132,14 +132,12 @@
             position: absolute;
             bottom: 8px;
             right: 8px;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.7);
             color: white;
             padding: 3px 8px;
             border-radius: 4px;
             font-size: 12px;
             font-weight: 600;
-            letter-spacing: 0.5px;
         }
 
         .search-container {
@@ -150,9 +148,9 @@
 
         .search-input {
             width: 100%;
-            background: #121212;
-            border: 1px solid #303030;
-            color: white;
+            background: #ffffff;
+            border: 1px solid #cccccc;
+            color: #111111;
             padding: 10px 48px 10px 16px;
             border-radius: 40px;
             outline: none;
@@ -160,13 +158,12 @@
         }
 
         .search-input:focus {
-            background: #1f1f1f;
             border-color: #3ea6ff;
             box-shadow: 0 0 0 1px #3ea6ff;
         }
 
         .search-input::placeholder {
-            color: #888;
+            color: #888888;
         }
 
         .search-button {
@@ -176,7 +173,7 @@
             transform: translateY(-50%);
             background: transparent;
             border: none;
-            color: #aaa;
+            color: #666666;
             padding: 8px 16px;
             cursor: pointer;
             border-radius: 20px;
@@ -184,30 +181,29 @@
         }
 
         .search-button:hover {
-            color: white;
-            background: #303030;
+            color: #111111;
+            background: #e0e0e0;
         }
 
         .category-chip {
             padding: 8px 16px;
-            background: #272727;
-            color: white;
+            background: #f0f0f0;
+            color: #111111;
             border-radius: 8px;
             border: none;
             cursor: pointer;
-            white-space: nowrap;
             font-weight: 500;
             font-size: 14px;
             transition: all 0.2s ease;
         }
 
         .category-chip:hover {
-            background: #3f3f3f;
+            background: #d9d9d9;
         }
 
         .category-chip.active {
-            background: white;
-            color: #0f0f0f;
+            background: #3ea6ff;
+            color: white;
         }
 
         .nav-item {
@@ -215,7 +211,7 @@
             align-items: center;
             gap: 24px;
             padding: 10px 12px;
-            color: #fff;
+            color: #111111;
             text-decoration: none;
             border-radius: 10px;
             transition: all 0.2s ease;
@@ -224,11 +220,11 @@
         }
 
         .nav-item:hover {
-            background: #272727;
+            background: #f0f0f0;
         }
 
         .nav-item.active {
-            background: #272727;
+            background: #e0e0e0;
             font-weight: 500;
         }
 
@@ -240,7 +236,7 @@
             transform: translateY(-50%);
             width: 3px;
             height: 24px;
-            background: #ff0000;
+            background: #3ea6ff;
             border-radius: 0 2px 2px 0;
         }
 
@@ -251,10 +247,6 @@
 
         .sidebar-mini .nav-text {
             display: none;
-        }
-
-        .sidebar-mini .nav-icon {
-            margin: 0;
         }
 
         .avatar {
@@ -308,7 +300,7 @@
             border-radius: 50%;
             background: transparent;
             border: none;
-            color: #fff;
+            color: #111111;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
@@ -317,14 +309,13 @@
         }
 
         .icon-button:hover {
-            background: #272727;
+            background: #f0f0f0;
         }
 
         .overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.2);
             z-index: 35;
             opacity: 0;
             pointer-events: none;
@@ -349,22 +340,21 @@
         }
 
         ::-webkit-scrollbar-track {
-            background: #0f0f0f;
+            background: #f5f5f5;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #3f3f3f;
+            background: #cccccc;
             border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #5f5f5f;
+            background: #b3b3b3;
         }
 
         .header {
-            background: rgba(15, 15, 15, 0.95);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid #272727;
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 1px solid #e0e0e0;
         }
 
         @keyframes slideIn {
@@ -372,6 +362,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -382,12 +373,29 @@
             animation: slideIn 0.5s ease forwards;
         }
 
-        .video-card:nth-child(1) { animation-delay: 0.05s; }
-        .video-card:nth-child(2) { animation-delay: 0.1s; }
-        .video-card:nth-child(3) { animation-delay: 0.15s; }
-        .video-card:nth-child(4) { animation-delay: 0.2s; }
-        .video-card:nth-child(5) { animation-delay: 0.25s; }
-        .video-card:nth-child(6) { animation-delay: 0.3s; }
+        .video-card:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .video-card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .video-card:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+
+        .video-card:nth-child(4) {
+            animation-delay: 0.2s;
+        }
+
+        .video-card:nth-child(5) {
+            animation-delay: 0.25s;
+        }
+
+        .video-card:nth-child(6) {
+            animation-delay: 0.3s;
+        }
 
         .logo {
             display: flex;
@@ -395,12 +403,13 @@
             gap: 8px;
             font-weight: 700;
             font-size: 20px;
+            color: #111111;
         }
 
         .logo-icon {
             width: 32px;
             height: 32px;
-            background: linear-gradient(135deg, #fff 0%, #fff 100%);
+            background: #3ea6ff;
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -409,6 +418,7 @@
     </style>
     @stack('styles')
 </head>
+
 <body>
     @include('template.header')
 
@@ -419,12 +429,13 @@
     </main>
     @stack('scripts')
     <script>
-         let sidebarExpanded = false;
+        let sidebarExpanded = false;
+
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('mainContent');
             const overlay = document.getElementById('overlay');
-            
+
             if (window.innerWidth <= 768) {
                 sidebar.classList.toggle('mobile-open');
                 overlay.classList.toggle('active');
@@ -457,15 +468,11 @@
         }
 
         document.getElementById('searchInput')?.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                searchVideos();
-            }
+            if (e.key === 'Enter') searchVideos();
         });
 
         document.getElementById('mobileSearchInput')?.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                searchVideosMobile();
-            }
+            if (e.key === 'Enter') searchVideosMobile();
         });
 
         window.addEventListener('resize', function() {
@@ -480,4 +487,5 @@
         renderVideos(filteredVideos);
     </script>
 </body>
+
 </html>
