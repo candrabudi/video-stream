@@ -63,27 +63,27 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // ANALYTICS / VIEWS
-    Route::get('analytics/overview', [ViewController::class, 'overview'])->name('analytics.overview');
-    Route::get('views', [ViewController::class, 'index'])->name('views.index');
+    Route::get('analytics/overview', [HomePageController::class, 'overview'])->name('analytics.overview');
+    Route::get('views', [HomePageController::class, 'index'])->name('views.index');
 
     // SEO
-    Route::get('seo', [SeoController::class, 'index'])->name('seo.index');
-    Route::get('seo/{id}/edit', [SeoController::class, 'edit'])->name('seo.edit');
-    Route::post('seo/{id}/update', [SeoController::class, 'update'])->name('seo.update');
+    Route::get('seo', [HomePageController::class, 'index'])->name('seo.index');
+    Route::get('seo/{id}/edit', [HomePageController::class, 'edit'])->name('seo.edit');
+    Route::post('seo/{id}/update', [HomePageController::class, 'update'])->name('seo.update');
 
     // USERS
-    Route::get('users', [UserController::class, 'index'])->name('users.index');
-    Route::get('users/create', [UserController::class, 'create'])->name('users.create');
-    Route::post('users/store', [UserController::class, 'store'])->name('users.store');
-    Route::get('users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
-    Route::post('users/{id}/update', [UserController::class, 'update'])->name('users.update');
-    Route::delete('users/{id}/delete', [UserController::class, 'destroy'])->name('users.destroy');
+    Route::get('users', [HomePageController::class, 'index'])->name('users.index');
+    Route::get('users/create', [HomePageController::class, 'create'])->name('users.create');
+    Route::post('users/store', [HomePageController::class, 'store'])->name('users.store');
+    Route::get('users/{id}/edit', [HomePageController::class, 'edit'])->name('users.edit');
+    Route::post('users/{id}/update', [HomePageController::class, 'update'])->name('users.update');
+    Route::delete('users/{id}/delete', [HomePageController::class, 'destroy'])->name('users.destroy');
 
     // SETTINGS
-    Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
-    Route::post('settings/update', [SettingController::class, 'update'])->name('settings.update');
+    Route::get('settings', [HomePageController::class, 'index'])->name('settings.index');
+    Route::post('settings/update', [HomePageController::class, 'update'])->name('settings.update');
 
     // PROFILE
-    Route::get('profile', [ProfileController::class, 'index'])->name('profile.index');
-    Route::post('profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('profile', [HomePageController::class, 'index'])->name('profile.index');
+    Route::post('profile/update', [HomePageController::class, 'update'])->name('profile.update');
 });
