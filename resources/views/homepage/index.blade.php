@@ -58,6 +58,7 @@
             border: 1px solid #ccc;
             font-size: 14px;
             background-color: white;
+            min-width: 140px;
         }
 
         .category-chip.active {
@@ -74,14 +75,17 @@
 @endpush
 
 @section('content')
-    <div class="mb-4 overflow-x-auto flex gap-3">
-        <button class="category-chip active" onclick="filterCategory(this, 'all')">Semua</button>
-        @foreach (\App\Models\Category::orderBy('name')->get() as $category)
-            <button class="category-chip" onclick="filterCategory(this, '{{ $category->slug }}')">
-                {{ $category->name }}
-            </button>
-        @endforeach
+    <div class="mb-4 overflow-x-auto">
+        <div class="flex gap-3 whitespace-nowrap px-2">
+            <button class="category-chip active" onclick="filterCategory(this, 'all')">Semua</button>
+            @foreach (\App\Models\Category::orderBy('name')->get() as $category)
+                <button class="category-chip" onclick="filterCategory(this, '{{ $category->slug }}')">
+                    {{ $category->name }}
+                </button>
+            @endforeach
+        </div>
     </div>
+
 
     <div id="videoGrid" class="video-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
 @endsection
@@ -160,5 +164,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', fetchVideos);
+
+        renderVideos(filteredVideos);
     </script>
 @endpush

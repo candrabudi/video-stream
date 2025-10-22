@@ -12,7 +12,7 @@ class ChannelController extends Controller
     // 1. Tampilkan halaman index
     public function index()
     {
-        return view('bo.channels.index');
+        return view('channels.index');
     }
 
     // 2. List data (AJAX)
@@ -60,7 +60,6 @@ class ChannelController extends Controller
     public function update(Request $request, $id)
     {
         $channel = Channel::findOrFail($id);
-
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:channels,name,'.$channel->id,
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -84,7 +83,11 @@ class ChannelController extends Controller
             'subscribers' => $validated['subscribers'] ?? 0,
         ]);
 
-        return response()->json(['success' => true, 'message' => 'Channel berhasil diperbarui', 'data' => $channel]);
+        return response()->json([
+            'success' => true,
+            'message' => 'Channel berhasil diperbarui',
+            'data' => $channel,
+        ]);
     }
 
     // 6. Hapus channel

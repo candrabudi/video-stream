@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title') | Waskita</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <style>
         * {
             margin: 0;
@@ -195,6 +198,7 @@
             font-weight: 500;
             font-size: 14px;
             transition: all 0.2s ease;
+            min-width: 140px;
         }
 
         .category-chip:hover {
@@ -429,7 +433,7 @@
     </main>
     @stack('scripts')
     <script>
-        let sidebarExpanded = false;
+        let sidebarExpanded = true;
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -467,6 +471,15 @@
             mobileSearch.classList.toggle('hidden');
         }
 
+
+
+        // Set default sidebar aktif saat load
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        sidebar.classList.add('sidebar-full');
+        sidebar.classList.remove('sidebar-mini');
+        mainContent.classList.add('main-full');
+        mainContent.classList.remove('main-mini');
         document.getElementById('searchInput')?.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') searchVideos();
         });
@@ -483,9 +496,8 @@
                 overlay.classList.remove('active');
             }
         });
-
-        renderVideos(filteredVideos);
     </script>
+
 </body>
 
 </html>

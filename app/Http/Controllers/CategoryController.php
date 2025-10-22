@@ -11,7 +11,7 @@ class CategoryController extends Controller
     // 1. Tampilkan halaman index
     public function index()
     {
-        return view('bo.categories.index');
+        return view('categories.index');
     }
 
     // 2. List data (AJAX)

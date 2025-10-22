@@ -14,16 +14,22 @@
             </a>
         </div>
 
-        <div class="search-container hidden md:block">
-            <input type="text" id="searchInput" placeholder="Cari video, channel, atau kategori..."
-                class="search-input">
-            <button onclick="searchVideos()" class="search-button">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-            </button>
+        <div class="search-container hidden md:flex items-center">
+            <form action="{{ route('videos.search') }}" method="GET"
+                class="flex items-center bg-gray-100 rounded-full overflow-hidden">
+                <input type="text" name="query" id="searchInput"
+                    placeholder="Cari video, channel, atau kategori..."
+                    class="px-4 py-2 text-sm text-gray-700 bg-transparent outline-none w-64 md:w-80 focus:w-96 transition-all duration-300">
+
+                <button type="submit" class="px-3 text-gray-600 hover:text-gray-800">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </button>
+            </form>
         </div>
+
 
         <div class="flex items-center gap-2">
             <button class="icon-button md:hidden" onclick="toggleMobileSearch()">

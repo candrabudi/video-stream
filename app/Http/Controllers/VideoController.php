@@ -21,9 +21,60 @@ class VideoController extends Controller
         return response()->json($videos);
     }
 
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+
+        $videos = Video::with(['channel'])
+            ->when($query, function ($q) use ($query) {
+                $q->where('title', 'like', "%{$query}%")
+                  ->orWhere('description', 'like', "%{$query}%")
+                  ->orWhereHas('channel', fn ($qc) => $qc->where('name', 'like', "%{$query}%"));
+            })
+            ->where('status', 'published')
+            ->latest()
+            ->paginate(9);
+
+        $recommendations = Video::with('channel')
+            ->where('status', 'published')
+            ->inRandomOrder()
+            ->take(5)
+            ->get();
+
+        return view('videos.search', compact('videos', 'recommendations', 'query'));
+    }
+
+    public function searchApi(Request $request)
+    {
+        $query = $request->input('query');
+
+        $videos = Video::with(['channel', 'category'])
+            ->when($query, function ($q) use ($query) {
+                $q->where('title', 'like', "%{$query}%")
+                  ->orWhere('description', 'like', "%{$query}%")
+                  ->orWhereHas('channel', function ($q2) use ($query) {
+                      $q2->where('name', 'like', "%{$query}%");
+                  });
+            })
+            ->orderBy('uploaded_at', 'desc')
+            ->take(15)
+            ->get();
+
+        $recommendations = Video::with('channel')
+            ->inRandomOrder()
+            ->take(5)
+            ->get();
+
+        return response()->json([
+            'query' => $query,
+            'results' => $videos,
+            'recommendations' => $recommendations,
+        ]);
+    }
+
     public function create()
     {
-        return view('bo.videos.create');
+        return view('videos.create');
     }
 
     public function store(Request $request)

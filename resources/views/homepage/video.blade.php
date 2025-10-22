@@ -48,17 +48,6 @@
                         </div>
 
                         <div class="flex gap-2 text-sm text-gray-700">
-                            <div
-                                class="flex items-center bg-gray-200 rounded-full p-1.5 px-3 hover:bg-gray-300 transition duration-200 cursor-pointer">
-                                <i class='bx bxs-like text-xl mr-1.5'></i>
-                                <span class="font-semibold">{{ number_format(rand(100, 5000)) }}</span>
-                                <span class="w-px h-5 bg-gray-400 mx-2"></span>
-                                <i class='bx bxs-dislike text-xl'></i>
-                            </div>
-                            <button
-                                class="flex items-center bg-gray-200 rounded-full p-1.5 px-3 hover:bg-gray-300 transition duration-200">
-                                <i class='bx bx-share-alt text-lg mr-1'></i> Share
-                            </button>
                             <button
                                 class="flex items-center bg-gray-200 rounded-full p-1.5 px-3 hover:bg-gray-300 transition duration-200 hidden sm:flex">
                                 <i class='bx bx-download text-lg mr-1'></i> Download
@@ -78,7 +67,7 @@
 
                     <div class="text-sm text-gray-800" id="description-wrapper">
                         <p id="description-text" class="line-clamp-3">
-                            {{ trim($video->description ?? 'Tidak ada deskripsi yang tersedia untuk video ini.') }}
+                             {!! trim($video->description ?? '<em>Tidak ada deskripsi yang tersedia untuk video ini.</em>') !!}
                         </p>
                         <button id="toggle-description" class="mt-2 text-blue-600 font-semibold hover:underline hidden">
                             Show More
