@@ -10,13 +10,11 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
-            /* overlay hitam semi-transparan */
             display: flex;
             justify-content: center;
             align-items: center;
             pointer-events: none;
             border-radius: 0.5rem;
-            /* sama seperti thumbnail rounded-lg */
         }
 
         .play-overlay i {
@@ -70,6 +68,7 @@
 
         .thumbnail-wrapper {
             cursor: pointer;
+            position: relative;
         }
     </style>
 @endpush
@@ -103,8 +102,8 @@
                         channel: v.channel || '-',
                         views: (v.views || v.views_count || 0).toLocaleString() + ' tayangan',
                         time: v.time || '-',
-                        duration: v.duration || '00:00',
-                        thumbnail: v.thumbnail ? v.thumbnail :
+                        duration: v.duration || '00:00', // tetap tampilkan durasi
+                        thumbnail: v.thumbnail ||
                             'https://frompaddocktoplate.com.au/wp-content/uploads/2021/10/no-thumbnail.png',
                         category: v.category || 'uncategorized',
                     }));
@@ -124,7 +123,8 @@
             grid.innerHTML = videosToRender.map(video => `
         <div class="video-card">
             <div class="thumbnail-wrapper relative" data-id="${video.id}">
-                <img src="${video.thumbnail}" alt="${video.title}" class="thumbnail w-full object-cover rounded-lg">
+                <img src="${video.thumbnail}" 
+                     alt="${video.title}" class="thumbnail w-full object-cover rounded-lg">
                 <div class="play-overlay">
                     <i class='bx bx-play-circle'></i>
                 </div>
@@ -142,7 +142,6 @@
         </div>
     `).join('');
 
-            // Tambahkan event click ke thumbnail
             document.querySelectorAll('.thumbnail-wrapper').forEach(wrapper => {
                 wrapper.addEventListener('click', () => {
                     const videoId = wrapper.getAttribute('data-id');

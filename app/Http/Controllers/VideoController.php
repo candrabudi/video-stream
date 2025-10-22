@@ -38,11 +38,30 @@ class VideoController extends Controller
             'status' => 'required|in:draft,published',
         ]);
 
-        $thumbnailPath = $request->hasFile('thumbnail')
-            ? $request->file('thumbnail')->store('videos', 'public')
-            : null;
-
         $videoPath = $request->file('video_file')->store('videos', 'public');
+        $videoFullPath = storage_path('app/public/'.$videoPath);
+
+        if ($request->hasFile('thumbnail')) {
+            $thumbnailPath = $request->file('thumbnail')->store('videos', 'public');
+        } else {
+            $thumbnailName = pathinfo($videoPath, PATHINFO_FILENAME).'.jpg';
+            $thumbnailPath = 'videos/'.$thumbnailName;
+            $thumbnailFullPath = storage_path('app/public/'.$thumbnailPath);
+
+            $cmd = 'ffmpeg -i '.escapeshellarg($videoFullPath).' -ss 00:00:00 -vframes 1 '.escapeshellarg($thumbnailFullPath);
+            exec($cmd);
+        }
+
+        $duration = null;
+        $cmdDuration = 'ffprobe -i '.escapeshellarg($videoFullPath).' -show_entries format=duration -v quiet -of csv="p=0"';
+        $durationSec = shell_exec($cmdDuration);
+        if ($durationSec) {
+            $durationSec = floatval($durationSec);
+            $hours = floor($durationSec / 3600);
+            $minutes = floor(($durationSec % 3600) / 60);
+            $seconds = floor($durationSec % 60);
+            $duration = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+        }
 
         $video = Video::create([
             'title' => $validated['title'],
@@ -51,6 +70,7 @@ class VideoController extends Controller
             'category_id' => $validated['category_id'] ?? null,
             'thumbnail' => $thumbnailPath,
             'video_path' => $videoPath,
+            'duration' => $duration,
             'description' => $validated['description'] ?? null,
             'status' => $validated['status'],
             'uploaded_at' => now(),
@@ -82,9 +102,10 @@ class VideoController extends Controller
         ]);
 
         $thumbnailPath = $video->thumbnail;
+
         if ($request->hasFile('thumbnail')) {
-            if ($video->thumbnail && Storage::disk('public')->exists($video->thumbnail)) {
-                Storage::disk('public')->delete($video->thumbnail);
+            if ($thumbnailPath && Storage::disk('public')->exists($thumbnailPath)) {
+                Storage::disk('public')->delete($thumbnailPath);
             }
             $thumbnailPath = $request->file('thumbnail')->store('videos', 'public');
         }
@@ -93,8 +114,32 @@ class VideoController extends Controller
             if ($video->video_path && Storage::disk('public')->exists($video->video_path)) {
                 Storage::disk('public')->delete($video->video_path);
             }
+
             $videoPath = $request->file('video_file')->store('videos', 'public');
+            $videoFullPath = storage_path('app/public/'.$videoPath);
+
+            if (!$request->hasFile('thumbnail')) {
+                $thumbnailName = pathinfo($videoPath, PATHINFO_FILENAME).'.jpg';
+                $thumbnailPath = 'videos/'.$thumbnailName;
+                $thumbnailFullPath = storage_path('app/public/'.$thumbnailPath);
+
+                $cmd = 'ffmpeg -i '.escapeshellarg($videoFullPath).' -ss 00:00:00 -vframes 1 '.escapeshellarg($thumbnailFullPath);
+                exec($cmd);
+            }
+
+            $duration = null;
+            $cmdDuration = 'ffprobe -i '.escapeshellarg($videoFullPath).' -show_entries format=duration -v quiet -of csv="p=0"';
+            $durationSec = shell_exec($cmdDuration);
+            if ($durationSec) {
+                $durationSec = floatval($durationSec);
+                $hours = floor($durationSec / 3600);
+                $minutes = floor(($durationSec % 3600) / 60);
+                $seconds = floor($durationSec % 60);
+                $duration = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+            }
+
             $video->video_path = $videoPath;
+            $video->duration = $duration;
         }
 
         $video->update([

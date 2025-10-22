@@ -52,14 +52,14 @@
                     <div class="card-body p-5">
                         <div class="mb-4 d-flex justify-content-center">
                             <a href="index.html">
-                                <img src="https://cdn-icons-png.flaticon.com/128/837/837560.png" alt="logo"
+                                <img src="{{ asset('homepage/logo/logo.png') }}" alt="logo"
                                     class="desktop-logo">
-                                <img src="https://cdn-icons-png.flaticon.com/128/837/837560.png" alt="logo"
+                                <img src="{{ asset('homepage/logo/logo.png') }}" alt="logo"
                                     class="desktop-white">
                             </a>
                         </div>
                         <p class="h5 mb-2 text-center">Masuk</p>
-                        <p class="text-muted mb-4 text-center">Kelola Peternakan Dian Farm</p>
+                        <p class="text-muted mb-4 text-center">Kelola Video Waskita</p>
                         <div class="row gy-3">
                             <div class="col-xl-12">
                                 <label for="signin-username" class="form-label text-default">User Name</label>

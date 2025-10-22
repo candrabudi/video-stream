@@ -76,9 +76,9 @@
             <div class="container">
                 <span class="text-muted">
                     Copyright © <span id="year"></span>
-                    <a href="javascript:void(0);" class="text-dark fw-medium">Dinan Farm</a>.
+                    <a href="javascript:void(0);" class="text-dark fw-medium">VideoWaskita</a>.
                     Designed with <i class="bi bi-heart-fill text-danger"></i> by
-                    <a href="https://dinanfarm.com" target="_blank" class="fw-medium text-primary">Dinan Farm Team</a>.
+                    <a href="https://dinanfarm.com" target="_blank" class="fw-medium text-primary">VideoWaskita Team</a>.
                     All rights reserved.
                 </span>
             </div>

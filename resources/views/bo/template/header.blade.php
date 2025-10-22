@@ -4,17 +4,17 @@
             <div class="header-element">
                 <div class="horizontal-logo">
                     <a href="{{ url('/') }}" class="header-logo">
-                        <img src="https://cdn-icons-png.flaticon.com/128/837/837560.png" alt="logo"
+                        <img src="{{ asset('homepage/logo/logo.png') }}" alt="logo"
                             class="desktop-logo">
-                        <img src="https://cdn-icons-png.flaticon.com/128/837/837560.png" alt="logo"
+                        <img src="{{ asset('homepage/logo/logo.png') }}" alt="logo"
                             class="toggle-dark">
-                        <img src="https://cdn-icons-png.flaticon.com/128/837/837560.png" alt="logo"
+                        <img src="{{ asset('homepage/logo/logo.png') }}" alt="logo"
                             class="desktop-dark">
-                        <img src="https://cdn-icons-png.flaticon.com/128/837/837560.png" alt="logo"
+                        <img src="{{ asset('homepage/logo/logo.png') }}" alt="logo"
                             class="toggle-logo">
-                        <img src="https://cdn-icons-png.flaticon.com/128/837/837560.png" alt="logo"
+                        <img src="{{ asset('homepage/logo/logo.png') }}" alt="logo"
                             class="toggle-white">
-                        <img src="https://cdn-icons-png.flaticon.com/128/837/837560.png" alt="logo"
+                        <img src="{{ asset('homepage/logo/logo.png') }}" alt="logo"
                             class="desktop-white">
                     </a>
                 </div>
