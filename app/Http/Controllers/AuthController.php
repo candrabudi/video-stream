@@ -11,8 +11,6 @@ class AuthController extends Controller
 {
     public function index()
     {
-        return 'kongol';
-
         return view('bo.auth.login');
     }
 

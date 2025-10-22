@@ -15,7 +15,7 @@ class HomePageController extends Controller
 
     public function getVideos(Request $request)
     {
-        $category = $request->query('category'); // slug kategori dari query string
+        $category = $request->query('category');
 
         $query = Video::with(['channel', 'category'])->latest();
 

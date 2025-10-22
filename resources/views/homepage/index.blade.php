@@ -9,15 +9,19 @@
             left: 0;
             width: 100%;
             height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            /* overlay hitam semi-transparan */
             display: flex;
             justify-content: center;
             align-items: center;
             pointer-events: none;
+            border-radius: 0.5rem;
+            /* sama seperti thumbnail rounded-lg */
         }
 
         .play-overlay i {
             font-size: 48px;
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.9);
             opacity: 0;
             transition: opacity 0.2s, transform 0.2s;
         }
@@ -47,6 +51,25 @@
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
+        }
+
+        .category-chip {
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 9999px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            background-color: white;
+        }
+
+        .category-chip.active {
+            background-color: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+
+        .thumbnail-wrapper {
+            cursor: pointer;
         }
     </style>
 @endpush
@@ -81,7 +104,8 @@
                         views: (v.views || v.views_count || 0).toLocaleString() + ' tayangan',
                         time: v.time || '-',
                         duration: v.duration || '00:00',
-                        thumbnail: v.thumbnail ? v.thumbnail : '/images/default-thumbnail.png',
+                        thumbnail: v.thumbnail ? v.thumbnail :
+                            'https://frompaddocktoplate.com.au/wp-content/uploads/2021/10/no-thumbnail.png',
                         category: v.category || 'uncategorized',
                     }));
                     filteredVideos = [...allVideos];
@@ -98,21 +122,33 @@
             }
 
             grid.innerHTML = videosToRender.map(video => `
-                <div class="video-card" onclick="window.location.href='/get-videos/${video.id}'">
-                    <div class="thumbnail-wrapper">
-                        <img src="${video.thumbnail}" alt="${video.title}" class="thumbnail">
-                        <div class="play-overlay">
-                            <i class='bx bx-play-circle'></i>
-                        </div>
-                        <span class="duration-badge">${video.duration}</span>
-                    </div>
-                    <div class="p-3">
-                        <h3 class="font-semibold text-sm line-clamp-2 mb-1">${video.title}</h3>
-                        <p class="text-gray-400 text-xs mb-1">${video.channel}</p>
-                        <p class="text-gray-400 text-xs">${video.views} • ${video.time}</p>
-                    </div>
+        <div class="video-card">
+            <div class="thumbnail-wrapper relative" data-id="${video.id}">
+                <img src="${video.thumbnail}" alt="${video.title}" class="thumbnail w-full object-cover rounded-lg">
+                <div class="play-overlay">
+                    <i class='bx bx-play-circle'></i>
                 </div>
-            `).join('');
+                <span class="duration-badge">${video.duration}</span>
+            </div>
+            <div class="p-3">
+                <h3 class="font-semibold text-sm line-clamp-2 mb-1">
+                    <a href="/get-videos/${video.id}" class="hover:underline text-gray-900">
+                        ${video.title}
+                    </a>
+                </h3>
+                <p class="text-gray-400 text-xs mb-1">${video.channel}</p>
+                <p class="text-gray-400 text-xs">${video.views} • ${video.time}</p>
+            </div>
+        </div>
+    `).join('');
+
+            // Tambahkan event click ke thumbnail
+            document.querySelectorAll('.thumbnail-wrapper').forEach(wrapper => {
+                wrapper.addEventListener('click', () => {
+                    const videoId = wrapper.getAttribute('data-id');
+                    window.location.href = `/get-videos/${videoId}`;
+                });
+            });
         }
 
         function filterCategory(button, categorySlug) {

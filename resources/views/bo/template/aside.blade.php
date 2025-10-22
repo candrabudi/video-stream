@@ -54,7 +54,7 @@
                     </a>
                 </li>
 
-                <!-- VIEW ANALYTICS -->
+                {{-- <!-- VIEW ANALYTICS -->
                 <li class="slide__category"><span class="category-name">Analytics</span></li>
 
                 <li class="slide">
@@ -100,7 +100,7 @@
                         <i class="ri-account-circle-line side-menu__icon"></i>
                         <span class="side-menu__label">Profil Saya</span>
                     </a>
-                </li>
+                </li> --}}
 
             </ul>
         </nav>

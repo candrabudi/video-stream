@@ -1,7 +1,7 @@
 <aside id="sidebar"
     class="sidebar sidebar-mini fixed left-0 top-14 bottom-0 bg-white border-r border-gray-200 overflow-y-auto z-40">
     <nav class="p-2" style="margin-top: 25px;">
-        <a href="#" class="nav-item active">
+        <a href="/" class="nav-item active">
             <svg class="nav-icon w-6 h-6 text-gray-800" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
             </svg>
@@ -54,3 +54,46 @@
         </a>
     </nav>
 </aside>
+
+<!-- Toast Container -->
+<div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebarItems = document.querySelectorAll('#sidebar .nav-item');
+
+    sidebarItems.forEach(item => {
+        const text = item.querySelector('.nav-text').textContent.trim();
+
+        // Beranda tetap bisa diklik
+        if(text !== 'Beranda') {
+            item.addEventListener('click', function(e) {
+                e.preventDefault(); // cegah navigasi
+                showToast('Halaman ini sedang maintenance.');
+            });
+        }
+    });
+
+    function showToast(message, duration = 3000) {
+        const container = document.getElementById('toast-container');
+        if(!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = 'bg-gray-800 text-white px-4 py-2 rounded shadow-lg opacity-0 transform translate-y-2 transition-all duration-300';
+        toast.textContent = message;
+
+        container.appendChild(toast);
+
+        // Trigger animasi masuk
+        requestAnimationFrame(() => {
+            toast.classList.remove('opacity-0', 'translate-y-2');
+        });
+
+        // Hilang otomatis setelah durasi
+        setTimeout(() => {
+            toast.classList.add('opacity-0', 'translate-y-2');
+            toast.addEventListener('transitionend', () => toast.remove());
+        }, duration);
+    }
+});
+</script>
