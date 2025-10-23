@@ -30,6 +30,7 @@ class HomePageController extends Controller
                 'id' => $video->id,
                 'title' => $video->title,
                 'channel' => $video->channel->name ?? '-',
+                'description' => $video->description,
                 'views' => $video->views_count,
                 'time' => $video->uploaded_at ? Carbon::parse($video->uploaded_at)->diffForHumans() : '-',
                 'duration' => $video->duration ?? '-',

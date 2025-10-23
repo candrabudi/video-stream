@@ -14,9 +14,7 @@ class Category extends Model
         'name',
         'slug',
         'description',
-        'meta_title',
-        'meta_description',
-        'keywords',
+        'created_by',
     ];
 
     protected static function boot()
@@ -38,5 +36,10 @@ class Category extends Model
     public function totalViews()
     {
         return $this->videos()->sum('views_count');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

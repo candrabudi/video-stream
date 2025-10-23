@@ -14,6 +14,11 @@ class AuthController extends Controller
         return view('bo.auth.login');
     }
 
+    public function viewLoginUser()
+    {
+        return view('auth.login');
+    }
+
     public function login(Request $request)
     {
         $request->validate([
@@ -29,7 +34,7 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        $redirect = ($user->role === 'super_admin') ? '/dashboard' : '/dashboard';
+        $redirect = ($user->role === 'super_admin') ? '/dashboard' : '/';
 
         return response()->json([
             'message' => 'Login berhasil',
@@ -43,6 +48,9 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        return response()->json([
+            'message' => 'Logout berhasil',
+            'redirect' => '/login',
+        ], 200);
     }
 }

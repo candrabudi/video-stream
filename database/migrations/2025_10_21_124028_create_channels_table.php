@@ -16,7 +16,10 @@ return new class extends Migration {
             $table->string('slug')->unique();
             $table->string('avatar')->nullable();
             $table->text('description')->nullable();
-            $table->unsignedBigInteger('subscribers')->default(0);
+
+            $table->unsignedBigInteger('created_by');
+            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+
             $table->timestamps();
         });
     }

@@ -12,8 +12,18 @@ return new class extends Migration {
     {
         Schema::create('videos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('channel_id')->constrained('channels')->onDelete('cascade');
-            $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete();
+            $table->foreignId('channel_id')
+                  ->constrained('channels')
+                  ->onDelete('cascade');
+
+            $table->foreignId('category_id')
+                  ->nullable()
+                  ->constrained('categories')
+                  ->nullOnDelete();
+
+            $table->foreignId('created_by')
+                  ->constrained('users')
+                  ->onDelete('cascade');
             $table->string('title');
             $table->string('slug')->unique();
             $table->string('thumbnail')->nullable();
@@ -21,13 +31,9 @@ return new class extends Migration {
             $table->string('video_path')->nullable();
             $table->string('duration')->nullable();
             $table->text('description')->nullable();
+            $table->text('report_link')->nullable();
             $table->enum('status', ['draft', 'published'])->default('draft');
             $table->timestamp('uploaded_at')->nullable();
-            $table->unsignedBigInteger('views_count')->default(0);
-
-            $table->string('meta_title')->nullable();
-            $table->text('meta_description')->nullable();
-            $table->string('keywords')->nullable();
             $table->timestamps();
         });
     }

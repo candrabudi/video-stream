@@ -8,7 +8,6 @@
                 class="px-4 py-2 text-gray-600 border border-gray-300 rounded-full hover:bg-gray-100 transition">Kembali</button>
         </div>
 
-        <!-- Upload Stage -->
         <div id="upload-stage" class="bg-white shadow-xl rounded-xl p-10 text-center transition-all duration-300">
             <div id="video_file_input_area"
                 class="p-16 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-red-500 transition-all duration-200">
@@ -30,7 +29,6 @@
                 Komunitas Waskita.</p>
         </div>
 
-        <!-- Details Stage -->
         <div id="details-stage" class="bg-white shadow-xl rounded-xl p-6 md:p-8 hidden">
             <form id="videoForm" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
@@ -46,6 +44,11 @@
                     <div>
                         <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
                         <textarea id="description" class="yt-textarea rounded-lg" rows="5"></textarea>
+                    </div>
+
+                    <div>
+                        <label for="report_link" class="block text-sm font-medium text-gray-700 mb-1">Report Link</label>
+                        <textarea id="report_link" class="yt-textarea rounded-lg" rows="5"></textarea>
                     </div>
 
                     <div>
@@ -115,7 +118,8 @@
                                     d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
                                     clip-rule="evenodd" />
                             </svg>
-                            <p class="text-sm font-medium mt-2 text-gray-700" id="video-filename-display">Video Dipilih</p>
+                            <p class="text-sm font-medium mt-2 text-gray-700" id="video-filename-display">Video Dipilih
+                            </p>
                             <p class="text-xs text-gray-500 mt-1" id="video-size-display">Ukuran: N/A</p>
                         </div>
                     </div>
@@ -136,13 +140,15 @@
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-        let editorInstance;
+        let descriptionEditor, reportEditor;
+
         ClassicEditor.create(document.querySelector('#description'), {
-                toolbar: ['bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote']
-            })
-            .then(editor => {
-                editorInstance = editor;
-            }).catch(console.error);
+            toolbar: ['bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote']
+        }).then(editor => descriptionEditor = editor).catch(console.error);
+
+        ClassicEditor.create(document.querySelector('#report_link'), {
+            toolbar: ['bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote']
+        }).then(editor => reportEditor = editor).catch(console.error);
 
         function showToast(message, isError = false, duration = 3000) {
             const container = document.getElementById('toast-container');
@@ -150,7 +156,7 @@
             const baseClass =
                 'text-white px-4 py-3 rounded-lg shadow-xl opacity-0 transform translate-y-2 transition-all duration-300 font-medium';
             toast.className = isError ? `bg-red-700 ${baseClass}` : `bg-gray-800 ${baseClass}`;
-            toast.textContent = message;
+            toast.innerHTML = message;
             container.appendChild(toast);
             requestAnimationFrame(() => {
                 toast.classList.remove('opacity-0', 'translate-y-2');
@@ -172,8 +178,8 @@
 
             if (input.files && input.files[0]) {
                 const file = input.files[0];
-                if (fileNameDisplay) fileNameDisplay.textContent = file.name;
-                if (fileSizeDisplay) fileSizeDisplay.textContent = `Ukuran: ${(file.size/1024/1024).toFixed(2)} MB`;
+                fileNameDisplay.textContent = file.name;
+                fileSizeDisplay.textContent = `Ukuran: ${(file.size/1024/1024).toFixed(2)} MB`;
 
                 uploadStage.classList.add('hidden');
                 detailsStage.classList.remove('hidden');
@@ -211,9 +217,6 @@
                     preview.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
                 };
                 reader.readAsDataURL(input.files[0]);
-                const videoImg = document.getElementById('video-preview-img');
-                videoImg.src = URL.createObjectURL(input.files[0]);
-                videoImg.classList.remove('hidden');
             }
         }
 
@@ -224,13 +227,14 @@
                 showToast('Judul dan Video wajib diisi!', true);
                 return;
             }
+
             const btn = this;
             btn.disabled = true;
             btn.innerText = 'Menyimpan...';
             const formData = new FormData();
             formData.append('title', title);
-            formData.append('description', editorInstance ? editorInstance.getData() : document.getElementById(
-                'description').value);
+            formData.append('description', descriptionEditor ? descriptionEditor.getData() : '');
+            formData.append('report_link', reportEditor ? reportEditor.getData() : '');
             formData.append('channel_id', document.getElementById('channel_id').value);
             formData.append('category_id', document.getElementById('category_id').value);
             formData.append('status', document.getElementById('status').value);

@@ -14,14 +14,14 @@
             justify-content: center;
             align-items: center;
             pointer-events: none;
-            border-radius: 0.5rem;
+            border-radius: .5rem;
         }
 
         .play-overlay i {
             font-size: 48px;
             color: rgba(255, 255, 255, 0.9);
             opacity: 0;
-            transition: opacity 0.2s, transform 0.2s;
+            transition: opacity .2s, transform .2s;
         }
 
         .video-card:hover .play-overlay i {
@@ -86,7 +86,6 @@
         </div>
     </div>
 
-
     <div id="videoGrid" class="video-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
 @endsection
 
@@ -97,24 +96,39 @@
         let filteredVideos = [];
         let currentCategory = 'all';
 
+        function toIndoTime(t) {
+            if (!t) return '-';
+            return t
+                .replace(/days?/gi, 'hari')
+                .replace(/day/gi, 'hari')
+                .replace(/hours?/gi, 'jam')
+                .replace(/minutes?/gi, 'menit')
+                .replace(/seconds?/gi, 'detik')
+                .replace(/ago/gi, 'lalu')
+                .replace(/just now/gi, 'baru saja');
+        }
+
         function fetchVideos() {
             axios.get('/get-videos')
                 .then(res => {
-                    allVideos = res.data.map(v => ({
-                        id: v.id,
-                        title: v.title,
-                        channel: v.channel || '-',
-                        views: (v.views || v.views_count || 0).toLocaleString() + ' tayangan',
-                        time: v.time || '-',
-                        duration: v.duration || '00:00', // tetap tampilkan durasi
-                        thumbnail: v.thumbnail ||
-                            'https://frompaddocktoplate.com.au/wp-content/uploads/2021/10/no-thumbnail.png',
-                        category: v.category || 'uncategorized',
-                    }));
+                    allVideos = res.data.map(v => {
+                        let desc = v.description ? v.description.replace(/<[^>]+>/g, '') : '-';
+                        if (desc.length > 120) desc = desc.substring(0, 120) + '...';
+                        return {
+                            id: v.id,
+                            title: v.title,
+                            channel: v.channel || '-',
+                            time: toIndoTime(v.time),
+                            duration: v.duration || '00:00',
+                            thumbnail: v.thumbnail ||
+                                'https://frompaddocktoplate.com.au/wp-content/uploads/2021/10/no-thumbnail.png',
+                            category: v.category || 'uncategorized',
+                            description: desc
+                        };
+                    });
                     filteredVideos = [...allVideos];
                     renderVideos(filteredVideos);
-                })
-                .catch(err => console.error(err));
+                });
         }
 
         function renderVideos(videosToRender) {
@@ -125,31 +139,27 @@
             }
 
             grid.innerHTML = videosToRender.map(video => `
-        <div class="video-card">
-            <div class="thumbnail-wrapper relative" data-id="${video.id}">
-                <img src="${video.thumbnail}" 
-                     alt="${video.title}" class="thumbnail w-full object-cover rounded-lg">
-                <div class="play-overlay">
-                    <i class='bx bx-play-circle'></i>
+            <div class="video-card">
+                <div class="thumbnail-wrapper relative" data-id="${video.id}">
+                    <img src="${video.thumbnail}" alt="${video.title}" class="thumbnail w-full object-cover rounded-lg">
+                    <div class="play-overlay">
+                        <i class='bx bx-play-circle'></i>
+                    </div>
+                    <span class="duration-badge">${video.duration}</span>
                 </div>
-                <span class="duration-badge">${video.duration}</span>
+                <div class="p-3">
+                    <h3 class="font-semibold text-sm line-clamp-2 mb-1">
+                        <a href="/get-videos/${video.id}" class="hover:underline text-gray-900">${video.title}</a>
+                    </h3>
+                    <p class="text-gray-500 text-xs mb-1 line-clamp-2">${video.description}</p>
+                    <p class="text-gray-400 text-xs">${video.channel} • ${video.time}</p>
+                </div>
             </div>
-            <div class="p-3">
-                <h3 class="font-semibold text-sm line-clamp-2 mb-1">
-                    <a href="/get-videos/${video.id}" class="hover:underline text-gray-900">
-                        ${video.title}
-                    </a>
-                </h3>
-                <p class="text-gray-400 text-xs mb-1">${video.channel}</p>
-                <p class="text-gray-400 text-xs">${video.views} • ${video.time}</p>
-            </div>
-        </div>
-    `).join('');
+        `).join('');
 
             document.querySelectorAll('.thumbnail-wrapper').forEach(wrapper => {
                 wrapper.addEventListener('click', () => {
-                    const videoId = wrapper.getAttribute('data-id');
-                    window.location.href = `/get-videos/${videoId}`;
+                    window.location.href = `/get-videos/${wrapper.getAttribute('data-id')}`;
                 });
             });
         }
@@ -158,13 +168,11 @@
             currentCategory = categorySlug;
             document.querySelectorAll('.category-chip').forEach(chip => chip.classList.remove('active'));
             button.classList.add('active');
-
             filteredVideos = allVideos.filter(video => categorySlug === 'all' || video.category === categorySlug);
             renderVideos(filteredVideos);
         }
 
         document.addEventListener('DOMContentLoaded', fetchVideos);
-
         renderVideos(filteredVideos);
     </script>
 @endpush

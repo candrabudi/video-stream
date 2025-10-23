@@ -2,318 +2,178 @@
 
 @section('content')
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 
-    <div class="max-w-12xl mx-auto p-4 md:p-8">
-        <div class="flex flex-wrap justify-between items-center my-6 pb-4 border-b">
-            <h1 class="text-3xl font-bold text-gray-800">Manajemen Kategori</h1>
-            <button id="btnAddCategory"
-                class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg shadow-md transition duration-150 transform hover:scale-105"
-                onclick="openModalForCreate()">
-                Tambah Kategori
-            </button>
-        </div>
+    <div class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        <div id="categoryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
-            <div id="loadingRow" class="col-span-full text-center p-10">
-                <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-red-600 mx-auto"></div>
-                <p class="mt-4 text-gray-500 font-medium">Memuat data kategori...</p>
+        <!-- Tabel Kategori -->
+        <div class="lg:col-span-2 bg-white shadow rounded-xl p-5">
+            <div class="flex justify-between mb-4 pb-3 border-b">
+                <h2 class="text-xl font-bold flex items-center gap-2 text-red-600">
+                    <i class="ri-folder-2-line"></i> Data Kategori
+                </h2>
+
+                @if (auth()->user()->role === 'super_admin')
+                    <button onclick="resetForm()"
+                        class="flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md">
+                        <i class="ri-add-line text-xl"></i> Tambah
+                    </button>
+                @endif
             </div>
+
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-red-50 border-b text-sm text-gray-700">
+                        <th class="px-3 py-2 text-left">Nama Kategori</th>
+                        <th class="px-3 py-2 text-left">Deskripsi</th>
+                        <th class="px-3 py-2 text-left">Dibuat Oleh</th>
+                        <th class="px-3 py-2 w-32 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr id="loadingRow">
+                        <td colspan="4" class="text-center py-6 text-gray-500">
+                            <i class="ri-loader-4-line animate-spin text-xl"></i>
+                            Memuat data...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-    </div>
 
-    <!-- Modal -->
-    <div id="categoryModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
-        <div id="modalContent"
-            class="bg-white rounded-xl shadow-2xl w-full max-w-lg transform transition-all scale-95 opacity-0">
-            <form id="categoryForm" novalidate>
-                <div class="p-6">
-                    <div class="flex justify-between items-center border-b pb-3 mb-4">
-                        <h5 id="categoryModalTitle" class="text-xl font-bold">Tambah Kategori</h5>
-                        <button type="button" class="text-gray-400 hover:text-gray-600" onclick="closeModal()">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
+        <div class="bg-white shadow rounded-xl p-5">
+            <h2 class="text-xl font-bold mb-3 text-red-600 flex items-center gap-2">
+                <i class="ri-edit-line"></i> Kelola Kategori
+            </h2>
 
-                    <input type="hidden" id="categoryId" value="">
+            <form id="categoryForm" class="space-y-3">
+                <input type="hidden" id="categoryId">
 
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700" for="name">Nama Kategori</label>
-                            <input id="name" type="text" required class="w-full border rounded-lg px-3 py-2"
-                                placeholder="Nama kategori">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700" for="description">Deskripsi</label>
-                            <textarea id="description" class="w-full border rounded-lg px-3 py-2 min-h-[80px]" placeholder="Deskripsi (opsional)"></textarea>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700" for="meta_title">Meta Title</label>
-                            <input id="meta_title" type="text" class="w-full border rounded-lg px-3 py-2"
-                                placeholder="Meta title (opsional)">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700" for="meta_description">Meta
-                                Description</label>
-                            <textarea id="meta_description" class="w-full border rounded-lg px-3 py-2 min-h-[60px]"
-                                placeholder="Meta description (opsional)"></textarea>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700" for="keywords">Keywords</label>
-                            <input id="keywords" type="text" class="w-full border rounded-lg px-3 py-2"
-                                placeholder="kata kunci (dipisah koma)">
-                        </div>
-                    </div>
+                <div>
+                    <label class="text-sm font-semibold">Nama Kategori</label>
+                    <input id="category_name" type="text" class="w-full border rounded-lg px-3 py-2" required>
                 </div>
 
-                <div class="flex justify-end gap-3 p-4 bg-gray-50 rounded-b-xl border-t">
-                    <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg"
-                        onclick="closeModal()">Batal</button>
-                    <button id="saveBtn" type="submit"
-                        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">Simpan</button>
+                <div>
+                    <label class="text-sm font-semibold">Deskripsi</label>
+                    <textarea id="description" class="w-full border rounded-lg px-3 py-2"></textarea>
                 </div>
+
+                @if (auth()->user()->role === 'super_admin')
+                    <button type="submit"
+                        class="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white w-full py-2 rounded-md">
+                        <i class="ri-save-3-line text-xl"></i> Simpan
+                    </button>
+                @else
+                    <div class="text-xs text-gray-400 text-center italic">
+                        <i class="ri-lock-line"></i> Anda tidak memiliki akses untuk mengubah data
+                    </div>
+                @endif
             </form>
         </div>
     </div>
 
-    <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2"></div>
+    <div id="toast-container" class="fixed bottom-5 right-5 space-y-2 z-50"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
     <script>
-        (function() {
-            // awal: set CSRF header (aman karena meta ada di head)
-            axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]')
-                ?.content || '';
+        const isSuperAdmin = "{{ auth()->user()->role }}" === "super_admin";
+        axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').content;
 
-            // util toast
-            function showToast(message, isError = false) {
-                const container = document.getElementById('toast-container');
-                if (!container) return;
-                const toast = document.createElement('div');
-                toast.className = (isError ? 'bg-red-700 ' : 'bg-gray-800 ') + 'text-white px-4 py-2 rounded-lg shadow';
-                toast.textContent = message;
-                container.appendChild(toast);
-                requestAnimationFrame(() => {
-                    toast.style.opacity = 1;
-                    toast.style.transform = 'translateY(0)';
-                });
-                setTimeout(() => {
-                    toast.style.transition = 'all .25s';
-                    toast.style.opacity = 0;
-                    toast.style.transform = 'translateY(10px)';
-                    toast.addEventListener('transitionend', () => toast.remove());
-                }, 3000);
-            }
+        function toast(msg, err = false) {
+            const box = document.createElement('div');
+            box.className = (err ? "bg-red-700" : "bg-black") +
+                " text-white px-4 py-2 rounded-lg shadow flex items-center gap-2";
+            box.innerHTML = `<i class="ri-information-line"></i>${msg}`;
+            document.getElementById('toast-container').appendChild(box);
+            setTimeout(() => box.remove(), 2500);
+        }
 
-            // modal helpers
-            function openModal() {
-                const modal = document.getElementById('categoryModal');
-                const content = document.getElementById('modalContent');
-                if (!modal || !content) return;
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-                // animate in
-                requestAnimationFrame(() => {
-                    content.classList.remove('scale-95', 'opacity-0');
-                    content.classList.add('scale-100', 'opacity-100');
-                });
-            }
+        function escape(t) {
+            return t?.replace(/</g, "&lt;") ?? "";
+        }
 
-            function closeModal() {
-                const modal = document.getElementById('categoryModal');
-                const content = document.getElementById('modalContent');
-                if (!modal || !content) return;
-                content.classList.remove('scale-100', 'opacity-100');
-                content.classList.add('scale-95', 'opacity-0');
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
-                }, 250);
-            }
+        function fetchCategories() {
+            axios.get("{{ route('categories.list') }}").then(res => {
+                const categories = res.data.data ?? [];
+                const tb = document.getElementById('tableBody');
+                tb.innerHTML = '';
 
-            // open modal for create (reset form)
-            window.openModalForCreate = function() {
-                const form = document.getElementById('categoryForm');
-                if (form) form.reset();
-                document.getElementById('categoryId').value = '';
-                document.getElementById('categoryModalTitle').innerText = 'Tambah Kategori';
-                openModal();
-            };
-
-            // open modal for edit (populate then open)
-            window.openModalForEdit = function(data) {
-                // populate fields first
-                document.getElementById('categoryId').value = data.id ?? '';
-                document.getElementById('name').value = data.name ?? '';
-                document.getElementById('description').value = data.description ?? '';
-                document.getElementById('meta_title').value = data.meta_title ?? '';
-                document.getElementById('meta_description').value = data.meta_description ?? '';
-                document.getElementById('keywords').value = data.keywords ?? '';
-                document.getElementById('categoryModalTitle').innerText = 'Edit Kategori';
-                openModal();
-            };
-
-            // fetch
-            window.fetchCategories = function() {
-                const loadingRow = document.getElementById('loadingRow');
-                if (loadingRow) loadingRow.style.display = 'block';
-                axios.get("{{ route('categories.list') }}")
-                    .then(res => {
-                        if (loadingRow) loadingRow.style.display = 'none';
-                        renderCategories(Array.isArray(res.data) ? res.data : (res.data.data ?? []));
-                    })
-                    .catch(err => {
-                        if (loadingRow) loadingRow.style.display = 'none';
-                        console.error('fetchCategories error:', err);
-                        showToast('Gagal memuat data kategori', true);
-                    });
-            };
-
-            function renderCategories(categories) {
-                const grid = document.getElementById('categoryGrid');
-                if (!grid) return;
-                grid.innerHTML = '';
-                if (!categories || categories.length === 0) {
-                    grid.innerHTML = '<p class="text-center col-span-full text-gray-500 p-10">Belum ada kategori.</p>';
+                if (categories.length === 0) {
+                    tb.innerHTML =
+                        '<tr><td colspan="4" class="text-center py-6 text-gray-500">Belum ada kategori.</td></tr>';
                     return;
                 }
+
                 categories.forEach(c => {
-                    const html = `
-                <div class="bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition duration-200 p-6 flex flex-col items-center text-center">
-                    <h5 class="font-bold text-xl text-gray-900 truncate max-w-full mb-2">${escapeHtml(c.name)}</h5>
-                    <p class="text-gray-500 text-sm mb-4 line-clamp-2 min-h-[40px]">${escapeHtml(c.description || '-')}</p>
-                    <div class="flex gap-3 mt-auto">
-                        <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm px-4 py-1.5 rounded-full" onclick="handleEdit(${c.id})">Edit</button>
-                        <button class="bg-red-100 hover:bg-red-200 text-red-600 text-sm px-4 py-1.5 rounded-full" onclick="handleDelete(${c.id})">Hapus</button>
-                    </div>
-                </div>
-            `;
-                    grid.insertAdjacentHTML('beforeend', html);
+                    tb.insertAdjacentHTML('beforeend', `
+                        <tr class="border-b hover:bg-red-50/20">
+                            <td class="px-3 py-2 font-medium">${escape(c.name)}</td>
+                            <td class="px-3 py-2 text-gray-600">${escape(c.description ?? '-')}</td>
+                            <td class="px-3 py-2 text-gray-500 italic">${c.creator?.username ?? '-'}</td>
+                            <td class="px-3 py-2 text-center flex gap-2 justify-center">
+                                ${
+                                    isSuperAdmin ?
+                                    `<button onclick="edit(${c.id})" title="Edit" class="text-blue-600 hover:scale-110 transition">
+                                                <i class="ri-edit-line text-lg"></i>
+                                            </button>
+                                            <button onclick="del(${c.id})" title="Hapus" class="text-red-600 hover:scale-110 transition">
+                                                <i class="ri-delete-bin-6-line text-lg"></i>
+                                            </button>` :
+                                    `<i class="ri-lock-line text-gray-400 text-lg"></i>`
+                                }
+                            </td>
+                        </tr>
+                    `);
                 });
-            }
+            }).catch(() => toast('Gagal memuat kategori', true));
+        }
 
-            // escape helper to avoid XSS when inserting strings
-            function escapeHtml(text) {
-                if (text === null || text === undefined) return '';
-                return String(text)
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;')
-                    .replace(/"/g, '&quot;')
-                    .replace(/'/g, '&#039;');
-            }
+        function resetForm() {
+            categoryId.value = "";
+            category_name.value = "";
+            description.value = '';
+        }
 
-            // click edit handler: fetch the single category then open modal (populate first)
-            window.handleEdit = function(id) {
-                axios.get(`/categories/${id}/edit`)
-                    .then(res => {
-                        const c = res.data;
-                        // if controller returns wrapper like {data: {...}}, normalize:
-                        const data = (c && c.id) ? c : (c.data ?? c);
-                        if (!data || !data.id) {
-                            console.error('edit: invalid data', c);
-                            showToast('Data kategori tidak valid', true);
-                            return;
-                        }
-                        openModalForEdit(data);
-                    })
-                    .catch(err => {
-                        console.error('edit fetch error:', err);
-                        showToast('Gagal mengambil data kategori', true);
-                    });
-            };
-
-            // submit create/update
-            document.getElementById('categoryForm')?.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const saveBtn = document.getElementById('saveBtn');
-                if (saveBtn) {
-                    saveBtn.disabled = true;
-                    saveBtn.innerText = 'Menyimpan...';
-                }
-                const id = document.getElementById('categoryId').value || '';
-                const payload = {
-                    name: document.getElementById('name').value.trim(),
-                    description: document.getElementById('description').value.trim(),
-                    meta_title: document.getElementById('meta_title').value.trim(),
-                    meta_description: document.getElementById('meta_description').value.trim(),
-                    keywords: document.getElementById('keywords').value.trim(),
-                };
-
-                const url = id ? `/categories/${id}/update` : `/categories/store`;
-
-                // use axios.post with JSON (controller expects Request - will validate)
-                axios.post(url, payload)
-                    .then(res => {
-                        const data = res.data;
-                        console.log('save response:', data);
-                        if (data && data.success) {
-                            fetchCategories();
-                            closeModal();
-                            showToast(data.message || 'Berhasil disimpan');
-                        } else {
-                            const msg = (data && data.message) ? data.message : 'Gagal menyimpan';
-                            showToast(msg, true);
-                        }
-                    })
-                    .catch(err => {
-                        console.error('save error:', err);
-                        // try to show validation message if present
-                        const msg = err.response?.data?.message || err.response?.data?.errors ||
-                            'Gagal menyimpan';
-                        showToast(Array.isArray(msg) ? JSON.stringify(msg) : (typeof msg === 'object' ? JSON
-                            .stringify(msg) : msg), true);
-                    })
-                    .finally(() => {
-                        if (saveBtn) {
-                            saveBtn.disabled = false;
-                            saveBtn.innerText = 'Simpan Kategori';
-                        }
-                    });
+        function edit(id) {
+            if (!isSuperAdmin) return;
+            axios.get(`/categories/${id}/edit`).then(res => {
+                const c = res.data.data ?? res.data;
+                categoryId.value = c.id;
+                category_name.value = c.name ?? "";
+                description.value = c.description ?? "";
             });
+        }
 
-            // delete
-            window.handleDelete = function(id) {
-                if (!confirm('Apakah yakin ingin menghapus kategori ini?')) return;
-                axios.delete(`/categories/${id}/delete`)
-                    .then(res => {
-                        const data = res.data;
-                        if (data && data.success) {
-                            fetchCategories();
-                            showToast(data.message || 'Kategori dihapus');
-                        } else {
-                            showToast('Gagal menghapus', true);
-                        }
-                    })
-                    .catch(err => {
-                        console.error('delete error:', err);
-                        showToast('Gagal menghapus', true);
-                    });
-            };
+        function del(id) {
+            if (!isSuperAdmin) return;
+            if (!confirm("Yakin ingin menghapus kategori ini?")) return;
+            axios.delete(`/categories/${id}/delete`)
+                .then(() => {
+                    fetchCategories();
+                    toast("Data berhasil dihapus");
+                })
+                .catch(() => toast("Gagal menghapus data", true));
+        }
 
-            // initial load after DOM ready
-            document.addEventListener('DOMContentLoaded', function() {
-                // Safety: ensure required DOM nodes exist
-                if (!document.getElementById('categoryGrid')) {
-                    console.error('categoryGrid element not found');
-                    return;
-                }
+        document.getElementById('categoryForm').addEventListener('submit', e => {
+            e.preventDefault();
+            if (!isSuperAdmin) return;
+
+            const id = categoryId.value;
+            const url = id ? `/categories/${id}/update` : `/categories/store`;
+
+            axios.post(url, {
+                name: category_name.value,
+                description: description.value,
+            }).then(() => {
+                resetForm();
                 fetchCategories();
-            });
+                toast("Data berhasil disimpan");
+            }).catch(() => toast("Gagal menyimpan data", true));
+        });
 
-            // expose some functions to global scope for inline onclick
-            window.fetchCategories = fetchCategories;
-            window.openModal = openModal;
-            window.closeModal = closeModal;
-            window.openModalForEdit = openModalForEdit;
-            window.openModalForCreate = window.openModalForCreate;
-        })();
+        document.addEventListener("DOMContentLoaded", fetchCategories);
     </script>
 @endsection

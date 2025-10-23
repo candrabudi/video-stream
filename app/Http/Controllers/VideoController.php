@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
+use App\Models\Channel;
 use App\Models\Video;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -11,70 +14,46 @@ class VideoController extends Controller
 {
     public function index()
     {
-        return view('bo.videos.index');
+        $channels = Channel::orderBy('name')->get();
+        $categories = Category::orderBy('name')->get();
+
+        return view('videos.index', compact('channels', 'categories'));
     }
 
-    public function listData()
+    public function listData(Request $request)
     {
-        $videos = Video::with(['channel', 'category'])->latest()->get();
+        $search = $request->input('search');
+        $channelId = $request->input('channel');
+        $categoryId = $request->input('category');
+        $perPage = 9;
+        $page = $request->input('page', 1);
+
+        $query = Video::with(['channel', 'category', 'creator'])
+            ->when($search, function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhereHas('channel', function ($qc) use ($search) {
+                      $qc->where('name', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('creator', function ($qc) use ($search) {
+                      $qc->where('name', 'like', "%{$search}%");
+                  });
+            })
+            ->when($channelId, fn ($q) => $q->where('channel_id', $channelId))
+            ->when($categoryId, fn ($q) => $q->where('category_id', $categoryId))
+            ->orderBy('uploaded_at', 'desc');
+
+        $videos = $query->skip(($page - 1) * $perPage)->take($perPage)->get();
 
         return response()->json($videos);
     }
 
-    public function search(Request $request)
-    {
-        $query = $request->input('query');
-
-        $videos = Video::with(['channel'])
-            ->when($query, function ($q) use ($query) {
-                $q->where('title', 'like', "%{$query}%")
-                  ->orWhere('description', 'like', "%{$query}%")
-                  ->orWhereHas('channel', fn ($qc) => $qc->where('name', 'like', "%{$query}%"));
-            })
-            ->where('status', 'published')
-            ->latest()
-            ->paginate(9);
-
-        $recommendations = Video::with('channel')
-            ->where('status', 'published')
-            ->inRandomOrder()
-            ->take(5)
-            ->get();
-
-        return view('videos.search', compact('videos', 'recommendations', 'query'));
-    }
-
-    public function searchApi(Request $request)
-    {
-        $query = $request->input('query');
-
-        $videos = Video::with(['channel', 'category'])
-            ->when($query, function ($q) use ($query) {
-                $q->where('title', 'like', "%{$query}%")
-                  ->orWhere('description', 'like', "%{$query}%")
-                  ->orWhereHas('channel', function ($q2) use ($query) {
-                      $q2->where('name', 'like', "%{$query}%");
-                  });
-            })
-            ->orderBy('uploaded_at', 'desc')
-            ->take(15)
-            ->get();
-
-        $recommendations = Video::with('channel')
-            ->inRandomOrder()
-            ->take(5)
-            ->get();
-
-        return response()->json([
-            'query' => $query,
-            'results' => $videos,
-            'recommendations' => $recommendations,
-        ]);
-    }
-
     public function create()
     {
-        return view('videos.create');
+        $channels = Channel::orderBy('name')->get();
+        $categories = Category::orderBy('name')->get();
+
+        return view('videos.create', compact('channels', 'categories'));
     }
 
     public function store(Request $request)
@@ -87,6 +66,7 @@ class VideoController extends Controller
             'video_file' => 'required|file|mimes:mp4,mov,mkv|max:512000',
             'description' => 'nullable|string',
             'status' => 'required|in:draft,published',
+            'report_link' => 'nullable|max:1000',
         ]);
 
         $videoPath = $request->file('video_file')->store('videos', 'public');
@@ -98,7 +78,6 @@ class VideoController extends Controller
             $thumbnailName = pathinfo($videoPath, PATHINFO_FILENAME).'.jpg';
             $thumbnailPath = 'videos/'.$thumbnailName;
             $thumbnailFullPath = storage_path('app/public/'.$thumbnailPath);
-
             $cmd = 'ffmpeg -i '.escapeshellarg($videoFullPath).' -ss 00:00:00 -vframes 1 '.escapeshellarg($thumbnailFullPath);
             exec($cmd);
         }
@@ -114,7 +93,7 @@ class VideoController extends Controller
             $duration = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
         }
 
-        $video = Video::create([
+        Video::create([
             'title' => $validated['title'],
             'slug' => Str::slug($validated['title']),
             'channel_id' => $validated['channel_id'],
@@ -125,7 +104,8 @@ class VideoController extends Controller
             'description' => $validated['description'] ?? null,
             'status' => $validated['status'],
             'uploaded_at' => now(),
-            'views_count' => 0,
+            'created_by' => Auth::id(),
+            'report_link' => $validated['report_link'] ?? null,
         ]);
 
         return redirect()->route('videos.index')->with('success', 'Video berhasil dibuat');
@@ -134,8 +114,10 @@ class VideoController extends Controller
     public function edit($id)
     {
         $video = Video::findOrFail($id);
+        $channels = Channel::orderBy('name')->get();
+        $categories = Category::orderBy('name')->get();
 
-        return view('bo.videos.edit', compact('video'));
+        return view('videos.edit', compact('video', 'channels', 'categories'));
     }
 
     public function update(Request $request, $id)
@@ -150,6 +132,7 @@ class VideoController extends Controller
             'video_file' => 'nullable|file|mimes:mp4,mov,mkv|max:512000',
             'description' => 'nullable|string',
             'status' => 'required|in:draft,published',
+            'report_link' => 'nullable|max:1000',
         ]);
 
         $thumbnailPath = $video->thumbnail;
@@ -165,7 +148,6 @@ class VideoController extends Controller
             if ($video->video_path && Storage::disk('public')->exists($video->video_path)) {
                 Storage::disk('public')->delete($video->video_path);
             }
-
             $videoPath = $request->file('video_file')->store('videos', 'public');
             $videoFullPath = storage_path('app/public/'.$videoPath);
 
@@ -173,7 +155,6 @@ class VideoController extends Controller
                 $thumbnailName = pathinfo($videoPath, PATHINFO_FILENAME).'.jpg';
                 $thumbnailPath = 'videos/'.$thumbnailName;
                 $thumbnailFullPath = storage_path('app/public/'.$thumbnailPath);
-
                 $cmd = 'ffmpeg -i '.escapeshellarg($videoFullPath).' -ss 00:00:00 -vframes 1 '.escapeshellarg($thumbnailFullPath);
                 exec($cmd);
             }
@@ -201,6 +182,7 @@ class VideoController extends Controller
             'thumbnail' => $thumbnailPath,
             'description' => $validated['description'] ?? null,
             'status' => $validated['status'],
+            'report_link' => $validated['report_link'] ?? null,
         ]);
 
         return redirect()->route('videos.index')->with('success', 'Video berhasil diperbarui');

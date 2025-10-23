@@ -4,7 +4,6 @@
 <div class="bg-white min-h-screen">
     <div class="max-w-[1800px] mx-auto px-4 lg:px-6 py-4">
         
-        <!-- Search Info Header -->
         <div class="mb-6 flex items-center gap-3 border-b border-gray-200 pb-4">
             <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -15,13 +14,11 @@
         </div>
 
         <div class="flex gap-6">
-            <!-- MAIN RESULTS -->
             <div class="flex-1 space-y-4">
                 @forelse ($videos as $video)
                     <a href="{{ route('getVideos', $video->id) }}" 
                        class="flex gap-4 hover:bg-gray-50 rounded-xl transition duration-150 p-2 group">
-                       
-                        <!-- Thumbnail -->
+                    
                         <div class="relative w-[360px] aspect-video bg-gray-200 rounded-xl overflow-hidden flex-shrink-0">
                             <img src="{{ asset('/storage/'.$video->thumbnail ?? 'https://frompaddocktoplate.com.au/wp-content/uploads/2021/10/no-thumbnail.png') }}" 
                                  alt="{{ $video->title }}" 
@@ -33,14 +30,11 @@
                             @endif
                         </div>
 
-                        <!-- Video Details -->
                         <div class="flex-1 py-1">
-                            <!-- Title -->
                             <h2 class="text-lg font-medium text-gray-900 line-clamp-2 mb-2 group-hover:text-gray-900">
                                 {{ $video->title }}
                             </h2>
 
-                            <!-- Views & Date -->
                             <div class="flex items-center gap-2 text-sm text-gray-600 mb-3">
                                 <span>{{ number_format($video->views_count) }} views</span>
                                 <span class="text-gray-400">•</span>
