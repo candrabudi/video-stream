@@ -20,6 +20,29 @@ class VideoController extends Controller
         return view('videos.index', compact('channels', 'categories'));
     }
 
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+
+        $videos = Video::with(['channel'])
+            ->when($query, function ($q) use ($query) {
+                $q->where('title', 'like', "%{$query}%")
+                  ->orWhere('description', 'like', "%{$query}%")
+                  ->orWhereHas('channel', fn ($qc) => $qc->where('name', 'like', "%{$query}%"));
+            })
+            ->where('status', 'published')
+            ->latest()
+            ->paginate(9);
+
+        $recommendations = Video::with('channel')
+            ->where('status', 'published')
+            ->inRandomOrder()
+            ->take(5)
+            ->get();
+
+        return view('videos.search', compact('videos', 'recommendations', 'query'));
+    }
+
     public function listData(Request $request)
     {
         $search = $request->input('search');
@@ -125,7 +148,7 @@ class VideoController extends Controller
         $video = Video::findOrFail($id);
 
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'required|max:255',
             'channel_id' => 'required|exists:channels,id',
             'category_id' => 'nullable|exists:categories,id',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -138,51 +161,35 @@ class VideoController extends Controller
         $thumbnailPath = $video->thumbnail;
 
         if ($request->hasFile('thumbnail')) {
-            if ($thumbnailPath && Storage::disk('public')->exists($thumbnailPath)) {
-                Storage::disk('public')->delete($thumbnailPath);
-            }
+            Storage::disk('public')->delete($thumbnailPath);
             $thumbnailPath = $request->file('thumbnail')->store('videos', 'public');
         }
 
         if ($request->hasFile('video_file')) {
-            if ($video->video_path && Storage::disk('public')->exists($video->video_path)) {
-                Storage::disk('public')->delete($video->video_path);
-            }
+            Storage::disk('public')->delete($video->video_path);
             $videoPath = $request->file('video_file')->store('videos', 'public');
-            $videoFullPath = storage_path('app/public/'.$videoPath);
+            $videoFullPath = storage_path("app/public/$videoPath");
 
             if (!$request->hasFile('thumbnail')) {
                 $thumbnailName = pathinfo($videoPath, PATHINFO_FILENAME).'.jpg';
-                $thumbnailPath = 'videos/'.$thumbnailName;
-                $thumbnailFullPath = storage_path('app/public/'.$thumbnailPath);
-                $cmd = 'ffmpeg -i '.escapeshellarg($videoFullPath).' -ss 00:00:00 -vframes 1 '.escapeshellarg($thumbnailFullPath);
-                exec($cmd);
+                $thumbnailPath = "videos/$thumbnailName";
+                exec("ffmpeg -i '$videoFullPath' -ss 00:00:00 -vframes 1 '".storage_path("app/public/$thumbnailPath")."'");
             }
 
-            $duration = null;
-            $cmdDuration = 'ffprobe -i '.escapeshellarg($videoFullPath).' -show_entries format=duration -v quiet -of csv="p=0"';
-            $durationSec = shell_exec($cmdDuration);
-            if ($durationSec) {
-                $durationSec = floatval($durationSec);
-                $hours = floor($durationSec / 3600);
-                $minutes = floor(($durationSec % 3600) / 60);
-                $seconds = floor($durationSec % 60);
-                $duration = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
-            }
-
+            $durationSec = floatval(shell_exec("ffprobe -i '$videoFullPath' -show_entries format=duration -v quiet -of csv='p=0'"));
             $video->video_path = $videoPath;
-            $video->duration = $duration;
+            $video->duration = gmdate('H:i:s', $durationSec);
         }
 
         $video->update([
             'title' => $validated['title'],
             'slug' => Str::slug($validated['title']),
             'channel_id' => $validated['channel_id'],
-            'category_id' => $validated['category_id'] ?? null,
+            'category_id' => $validated['category_id'],
             'thumbnail' => $thumbnailPath,
-            'description' => $validated['description'] ?? null,
+            'description' => $validated['description'],
             'status' => $validated['status'],
-            'report_link' => $validated['report_link'] ?? null,
+            'report_link' => $validated['report_link'],
         ]);
 
         return redirect()->route('videos.index')->with('success', 'Video berhasil diperbarui');

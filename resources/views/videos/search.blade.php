@@ -16,7 +16,7 @@
         <div class="flex gap-6">
             <div class="flex-1 space-y-4">
                 @forelse ($videos as $video)
-                    <a href="{{ route('getVideos', $video->id) }}" 
+                    <a href="{{ route('homepage.video.show', $video->id) }}" 
                        class="flex gap-4 hover:bg-gray-50 rounded-xl transition duration-150 p-2 group">
                     
                         <div class="relative w-[360px] aspect-video bg-gray-200 rounded-xl overflow-hidden flex-shrink-0">
@@ -69,7 +69,7 @@
             <div class="hidden xl:block w-[400px] flex-shrink-0">
                 <div class="sticky top-4">
                     @foreach ($recommendations as $rec)
-                        <a href="{{ route('getVideos', $rec->id) }}" 
+                        <a href="{{ route('homepage.video.show', $rec->id) }}" 
                            class="flex gap-2 mb-3 hover:bg-gray-50 p-2 rounded-lg transition group">
                             
                             <!-- Thumbnail -->

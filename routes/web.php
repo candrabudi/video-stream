@@ -27,7 +27,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/create', [VideoController::class, 'create'])->name('create');
         Route::post('/store', [VideoController::class, 'store'])->name('store');
         Route::get('/{id}/edit', [VideoController::class, 'edit'])->name('edit');
-        Route::post('/{id}/update', [VideoController::class, 'update'])->name('update');
+        Route::post('/update/{id}', [VideoController::class, 'update'])->name('update');
         Route::delete('/{id}/delete', [VideoController::class, 'destroy'])->name('destroy');
     });
 
