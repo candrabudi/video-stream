@@ -43,6 +43,78 @@ class VideoController extends Controller
         return view('videos.search', compact('videos', 'recommendations', 'query'));
     }
 
+    public function apiSearch(Request $request)
+    {
+        $secret = $request->header('X-API-SECRET');
+        $storedSecret = config('app.api_secret');
+
+        if (!$storedSecret || !$secret || !hash_equals($storedSecret, $secret)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+            ], 401);
+        }
+
+        if ($request->ip() !== null) {
+            if (cache()->has('rl_'.$request->ip())) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Too Many Requests',
+                ], 429);
+            }
+            cache()->put('rl_'.$request->ip(), true, now()->addSeconds(1));
+        }
+
+        $validated = $request->validate([
+            'query' => 'nullable|string|max:100',
+            'limit' => 'nullable|integer|min:1|max:50',
+        ]);
+
+        $query = strip_tags($validated['query'] ?? '');
+        $limit = $validated['limit'] ?? 12;
+
+        try {
+            $videos = Video::with('channel')
+                ->where('status', 'published')
+                ->when($query, function ($q) use ($query) {
+                    $q->where(function ($x) use ($query) {
+                        $x->where('title', 'like', "%{$query}%")
+                          ->orWhere('description', 'like', "%{$query}%")
+                          ->orWhereHas('channel', fn ($c) => $c->where('name', 'like', "%{$query}%")
+                          )
+                          ->orWhereRaw('MATCH(title, description) AGAINST(? IN BOOLEAN MODE)', [$query]);
+                    });
+                })
+                ->selectRaw('
+                videos.*,
+                (CASE
+                    WHEN title LIKE ? THEN 50
+                    WHEN description LIKE ? THEN 30
+                    ELSE 10
+                END) as priority
+            ', ["%{$query}%", "%{$query}%"])
+                ->orderBy('priority', 'desc')
+                ->paginate($limit);
+
+            return response()->json([
+                'success' => true,
+                'query' => $query,
+                'pagination' => [
+                    'total' => $videos->total(),
+                    'per_page' => $videos->perPage(),
+                    'current_page' => $videos->currentPage(),
+                    'last_page' => $videos->lastPage(),
+                ],
+                'data' => $videos->items(),
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal Server Error',
+            ], 500);
+        }
+    }
+
     public function listData(Request $request)
     {
         $search = $request->input('search');
