@@ -23,7 +23,7 @@ Route::prefix('videos')->name('videos.')->group(function () {
     Route::post('/store', [VideoController::class, 'store'])->name('store');
     Route::get('/{id}/edit', [VideoController::class, 'edit'])->name('edit');
     Route::post('/update/{id}', [VideoController::class, 'update'])->name('update');
-    Route::delete('/{id}/delete', [VideoController::class, 'destroy'])->name('destroy');
+    Route::post('/{id}/delete', [VideoController::class, 'destroy'])->name('destroy');
 });
 Route::get('/get-videos', [HomePageController::class, 'getVideos'])->name('getVideos');
 Route::get('/get-videos/{id}', [HomePageController::class, 'showVideo'])->name('homepage.video.show');
