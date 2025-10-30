@@ -3,14 +3,11 @@
 <aside id="sidebar"
     class="sidebar sidebar-mini fixed left-0 top-14 bottom-0 bg-white border-r border-gray-200 overflow-y-auto z-40">
     <nav class="p-2 mt-6 space-y-2">
-
-        @if (Auth::user()->role == 'super_admin')
-            <a href="/dashboard"
-                class="nav-item flex items-center gap-3 p-2 rounded hover:bg-gray-100 {{ Request::is('dashboard') ? 'bg-gray-100 font-semibold' : '' }}">
-                <i class="ri-dashboard-line text-gray-800 text-xl"></i>
-                <span class="nav-text">Dashboard</span>
-            </a>
-        @endif
+        <a href="/dashboard"
+            class="nav-item flex items-center gap-3 p-2 rounded hover:bg-gray-100 {{ Request::is('dashboard') ? 'bg-gray-100 font-semibold' : '' }}">
+            <i class="ri-dashboard-line text-gray-800 text-xl"></i>
+            <span class="nav-text">Dashboard</span>
+        </a>
 
         <a href="/"
             class="nav-item flex items-center gap-3 p-2 rounded hover:bg-gray-100 {{ Request::is('/') ? 'bg-gray-100 font-semibold' : '' }}">
@@ -42,12 +39,14 @@
             <span class="nav-text">Kategori</span>
         </a>
 
-        @if (Auth::user()->role == 'super_admin')
-            <a href="/users"
-                class="nav-item flex items-center gap-3 p-2 rounded hover:bg-gray-100 {{ Request::is('users*') ? 'bg-gray-100 font-semibold' : '' }}">
-                <i class="ri-user-settings-line text-gray-800 text-xl"></i>
-                <span class="nav-text">Kelola User</span>
-            </a>
+        @if (Auth::user())     
+            @if (Auth::user()->role == 'super_admin')
+                <a href="/users"
+                    class="nav-item flex items-center gap-3 p-2 rounded hover:bg-gray-100 {{ Request::is('users*') ? 'bg-gray-100 font-semibold' : '' }}">
+                    <i class="ri-user-settings-line text-gray-800 text-xl"></i>
+                    <span class="nav-text">Kelola User</span>
+                </a>
+            @endif
         @endif
 
     </nav>

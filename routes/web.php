@@ -14,23 +14,21 @@ Route::get('/login', [AuthController::class, 'viewLoginUser'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+Route::get('/', [HomePageController::class, 'index']);
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::prefix('videos')->name('videos.')->group(function () {
+    Route::get('/', [VideoController::class, 'index'])->name('index');
+    Route::get('/list', [VideoController::class, 'listData'])->name('listData');
+    Route::get('/create', [VideoController::class, 'create'])->name('create');
+    Route::post('/store', [VideoController::class, 'store'])->name('store');
+    Route::get('/{id}/edit', [VideoController::class, 'edit'])->name('edit');
+    Route::post('/update/{id}', [VideoController::class, 'update'])->name('update');
+    Route::delete('/{id}/delete', [VideoController::class, 'destroy'])->name('destroy');
+});
+Route::get('/get-videos', [HomePageController::class, 'getVideos'])->name('getVideos');
+Route::get('/get-videos/{id}', [HomePageController::class, 'showVideo'])->name('homepage.video.show');
+Route::get('/search', [VideoController::class, 'search'])->name('videos.search');
 Route::middleware(['auth'])->group(function () {
-    Route::get('/', [HomePageController::class, 'index']);
-    Route::get('/get-videos', [HomePageController::class, 'getVideos'])->name('getVideos');
-    Route::get('/get-videos/{id}', [HomePageController::class, 'showVideo'])->name('homepage.video.show');
-    Route::get('/search', [VideoController::class, 'search'])->name('videos.search');
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-    Route::prefix('videos')->name('videos.')->group(function () {
-        Route::get('/', [VideoController::class, 'index'])->name('index');
-        Route::get('/list', [VideoController::class, 'listData'])->name('listData');
-        Route::get('/create', [VideoController::class, 'create'])->name('create');
-        Route::post('/store', [VideoController::class, 'store'])->name('store');
-        Route::get('/{id}/edit', [VideoController::class, 'edit'])->name('edit');
-        Route::post('/update/{id}', [VideoController::class, 'update'])->name('update');
-        Route::delete('/{id}/delete', [VideoController::class, 'destroy'])->name('destroy');
-    });
-
     Route::prefix('categories')->name('categories.')->group(function () {
         Route::get('/', [CategoryController::class, 'index'])->name('index');
         Route::get('/list', [CategoryController::class, 'list'])->name('list');

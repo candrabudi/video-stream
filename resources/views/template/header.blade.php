@@ -51,79 +51,80 @@
                         d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
             </button>
+            @if (Auth::user())
+                <div class="relative">
+                    <!-- Tombol Profil -->
+                    <button id="profileButton" onclick="toggleDropdown()"
+                        class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-semibold text-sm shadow-md transition duration-150 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">
+                        {{ strtoupper(substr(Auth::user()->username, 0, 2)) }}
+                    </button>
 
-            <div class="relative">
-    <!-- Tombol Profil -->
-    <button id="profileButton" onclick="toggleDropdown()"
-        class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-semibold text-sm shadow-md transition duration-150 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">
-        {{ strtoupper(substr(Auth::user()->username, 0, 2)) }}
-    </button>
+                    <!-- Dropdown Profil -->
+                    <div id="profileDropdown"
+                        class="absolute right-0 top-12 mt-1 w-56 bg-white rounded-xl shadow-2xl py-2 hidden ring-1 ring-black ring-opacity-5 transition transform origin-top-right duration-200">
 
-    <!-- Dropdown Profil -->
-    <div id="profileDropdown"
-        class="absolute right-0 top-12 mt-1 w-56 bg-white rounded-xl shadow-2xl py-2 hidden ring-1 ring-black ring-opacity-5 transition transform origin-top-right duration-200">
-        
-        <!-- Info User -->
-        <div class="px-4 py-3 border-b border-gray-100 mb-1">
-            <h4 class="text-sm text-gray-600">{{ Auth::user()->username }}</h4>
-        </div>
+                        <!-- Info User -->
+                        <div class="px-4 py-3 border-b border-gray-100 mb-1">
+                            <h4 class="text-sm text-gray-600">{{ Auth::user()->username }}</h4>
+                        </div>
 
-        <!-- Pengaturan -->
-        <a href="#" onclick="handleSetting(); return false;"
-            class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition duration-150 rounded-lg mx-2">
-            <i class="ri-settings-3-line text-lg"></i>
-            Pengaturan
-        </a>
+                        <!-- Pengaturan -->
+                        <a href="#" onclick="handleSetting(); return false;"
+                            class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition duration-150 rounded-lg mx-2">
+                            <i class="ri-settings-3-line text-lg"></i>
+                            Pengaturan
+                        </a>
 
-        <!-- Logout -->
-        <a href="#" onclick="handleLogout(); return false;"
-            class="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition duration-150 rounded-lg mx-2">
-            <i class="ri-logout-box-r-line text-lg"></i>
-            Keluar
-        </a>
-    </div>
-</div>
+                        <!-- Logout -->
+                        <a href="#" onclick="handleLogout(); return false;"
+                            class="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition duration-150 rounded-lg mx-2">
+                            <i class="ri-logout-box-r-line text-lg"></i>
+                            Keluar
+                        </a>
+                    </div>
+                </div>
 
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script>
-    // Toggle dropdown profil
-    function toggleDropdown() {
-        document.getElementById("profileDropdown").classList.toggle("hidden");
-    }
+                <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+                <script>
+                    // Toggle dropdown profil
+                    function toggleDropdown() {
+                        document.getElementById("profileDropdown").classList.toggle("hidden");
+                    }
 
-    // Alert pengaturan
-    function handleSetting() {
-        alert("Menu Pengaturan sedang dikembangkan 😄");
-    }
+                    // Alert pengaturan
+                    function handleSetting() {
+                        alert("Menu Pengaturan sedang dikembangkan 😄");
+                    }
 
-    // Logout via Axios
-    function handleLogout() {
-        axios.post("{{ route('logout') }}", {}, {
-            headers: {
-                'X-CSRF-TOKEN': "{{ csrf_token() }}",
-                'Accept': 'application/json',
-            }
-        })
-        .then(response => {
-            if (response.data.redirect) {
-                window.location.href = response.data.redirect;
-            }
-        })
-        .catch(error => {
-            console.error("Logout error:", error);
-            alert("Logout gagal, silakan coba lagi.");
-        });
-    }
+                    // Logout via Axios
+                    function handleLogout() {
+                        axios.post("{{ route('logout') }}", {}, {
+                                headers: {
+                                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                                    'Accept': 'application/json',
+                                }
+                            })
+                            .then(response => {
+                                if (response.data.redirect) {
+                                    window.location.href = response.data.redirect;
+                                }
+                            })
+                            .catch(error => {
+                                console.error("Logout error:", error);
+                                alert("Logout gagal, silakan coba lagi.");
+                            });
+                    }
 
-    // Tutup dropdown saat klik di luar
-    window.addEventListener("click", function(event) {
-        const dropdown = document.getElementById("profileDropdown");
-        const button = document.getElementById("profileButton");
-        if (!button.contains(event.target) && !dropdown.contains(event.target)) {
-            dropdown.classList.add("hidden");
-        }
-    });
-</script>
+                    // Tutup dropdown saat klik di luar
+                    window.addEventListener("click", function(event) {
+                        const dropdown = document.getElementById("profileDropdown");
+                        const button = document.getElementById("profileButton");
+                        if (!button.contains(event.target) && !dropdown.contains(event.target)) {
+                            dropdown.classList.add("hidden");
+                        }
+                    });
+                </script>
+            @endif
 
 
         </div>
