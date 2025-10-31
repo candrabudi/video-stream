@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Channel;
 use App\Models\Video;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -198,7 +199,7 @@ class VideoController extends Controller
             'description' => $validated['description'] ?? null,
             'status' => $validated['status'],
             'uploaded_at' => now(),
-            'created_by' => 1,
+            'created_by' => Auth::user()->id,
             'report_link' => $validated['report_link'] ?? null,
         ]);
 
